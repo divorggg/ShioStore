@@ -27,6 +27,7 @@ import coil.compose.AsyncImage
 import com.example.shiostore.domain.model.Product
 import com.example.shiostore.domain.model.dummyProducts
 import com.example.shiostore.ui.components.EmptyState
+import com.example.shiostore.ui.components.ProductSkeleton
 import com.example.shiostore.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,11 +62,19 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = viewMode
             )
 
             PromoBanner()
-
-            if (uiState.filteredProducts.isEmpty()) {
-                EmptyState(
-                    message = "Produk tidak ditemukan"
-                )
+            if (uiState.isLoading) {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(4) {
+                        ProductSkeleton()
+                    }
+                }
+            } else if (uiState.filteredProducts.isEmpty()) {
+                EmptyState("Produk tidak ditemukan")
             } else {
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
