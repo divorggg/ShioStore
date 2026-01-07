@@ -45,6 +45,14 @@ fun DetailScreen(
                     }
                 }
             )
+        },
+        bottomBar = {
+            BuyBottomBar(
+                price = product.price,
+                onBuyClick = {
+                    // NEXT DAY: Checkout
+                }
+            )
         }
     ) { paddingValues ->
 
@@ -59,7 +67,7 @@ fun DetailScreen(
                 contentDescription = product.name,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(240.dp)
+                    .height(260.dp)
                     .clip(RoundedCornerShape(16.dp)),
                 contentScale = ContentScale.Crop
             )
@@ -77,25 +85,15 @@ fun DetailScreen(
             Text(
                 text = "Rp ${product.price}",
                 color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = product.description ?: "Produk berkualitas terbaik.",
-                style = MaterialTheme.typography.bodyMedium
+                text = product.description ?: "Produk berkualitas terbaik."
             )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Button(
-                onClick = { /* next day */ },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Beli Sekarang")
-            }
         }
     }
 }
+

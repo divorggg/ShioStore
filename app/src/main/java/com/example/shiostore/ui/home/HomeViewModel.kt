@@ -2,7 +2,10 @@ package com.example.shiostore.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.shiostore.data.repository.ProductRepositoryImpl
+import com.example.shiostore.data.source.ProductDataSource
 import com.example.shiostore.domain.model.dummyProducts
+import com.example.shiostore.domain.usecase.GetProductsUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,7 +14,11 @@ import kotlinx.coroutines.launch
 
 class HomeViewModel : ViewModel() {
 
-    private val _uiState = MutableStateFlow(HomeUiState())
+    private val getProductsUseCase = GetProductsUseCase(
+        ProductRepositoryImpl(ProductDataSource())
+    )
+
+    private val _uiState = MutableStateFlow(HomeUiState(isLoading = true))
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
@@ -20,8 +27,7 @@ class HomeViewModel : ViewModel() {
 
     private fun loadProducts() {
         viewModelScope.launch {
-            delay(1000) // simulasi loading
-            val products = dummyProducts()
+            val products = getProductsUseCase()
             _uiState.value = HomeUiState(
                 products = products,
                 filteredProducts = products,
@@ -31,11 +37,8 @@ class HomeViewModel : ViewModel() {
     }
 
     fun onQueryChange(query: String) {
-        val allProducts = _uiState.value.products
-        val filtered = if (query.isBlank()) allProducts else {
-            allProducts.filter {
-                it.name.contains(query, ignoreCase = true)
-            }
+        val filtered = _uiState.value.products.filter {
+            it.name.contains(query, ignoreCase = true)
         }
 
         _uiState.value = _uiState.value.copy(
@@ -44,4 +47,5 @@ class HomeViewModel : ViewModel() {
         )
     }
 }
+
 
