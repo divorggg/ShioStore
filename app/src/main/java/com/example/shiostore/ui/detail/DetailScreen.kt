@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.shiostore.domain.model.dummyProducts
+import com.example.shiostore.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,7 +51,10 @@ fun DetailScreen(
             BuyBottomBar(
                 price = product.price,
                 onBuyClick = {
-                    // NEXT DAY: Checkout
+                    navController.navigate(
+                        Screen.Checkout.createRoute(product.id)
+
+                    )
                 }
             )
         }

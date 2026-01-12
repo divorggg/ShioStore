@@ -2,6 +2,7 @@ package com.example.shiostore.ui.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -32,70 +33,87 @@ import com.example.shiostore.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController, viewModel: HomeViewModel = viewModel()) {
-
+fun HomeScreen(
+    navController: NavController,
+    viewModel: HomeViewModel = viewModel()
+) {
     val uiState by viewModel.uiState.collectAsState()
 
-
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "ShioStore",
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            )
-        }
+        topBar = { HomeTopBar() },
+        bottomBar = { BottomNav() }
     ) { paddingValues ->
 
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .padding(paddingValues)
-                .fillMaxSize()
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            SearchBar(
-                query = uiState.query,
-                onQueryChange = viewModel::onQueryChange
-            )
+            item {
+                SearchBar(
+                    query = uiState.query,
+                    onQueryChange = viewModel::onQueryChange
+                )
+            }
 
-            PromoBanner()
-            if (uiState.isLoading) {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(4) {
-                        ProductSkeleton()
+            item { FeaturedSection() }
+
+            item { PromoBanner() }
+
+            item { DealOfDay() }
+
+            item {
+                when {
+                    uiState.isLoading -> {
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            modifier = Modifier.height(300.dp),
+                            contentPadding = PaddingValues(16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            items(4) {
+                                ProductSkeleton()
+                            }
+                        }
                     }
-                }
-            } else if (uiState.filteredProducts.isEmpty()) {
-                EmptyState("Produk tidak ditemukan")
-            } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(uiState.filteredProducts) { product ->
-                        ProductCard(
-                            product = product,
-                            onClick = { productId ->
-                                navController.navigate(
-                                    Screen.Detail.createRoute(productId)
+
+                    uiState.filteredProducts.isEmpty() -> {
+                        EmptyState("Produk tidak ditemukan")
+                    }
+
+                    else -> {
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            modifier = Modifier.height(520.dp),
+                            contentPadding = PaddingValues(16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            items(uiState.filteredProducts) { product ->
+                                ProductCard(
+                                    product = product,
+                                    onClick = {
+                                        navController.navigate(
+                                            Screen.Detail.createRoute(product.id)
+                                        )
+                                    }
                                 )
                             }
-                        )
-
+                        }
                     }
                 }
             }
+
+//            item { SpecialOfferBanner() }
+//
+//            item { TrendingSection() }
+
+            item { Spacer(Modifier.height(80.dp)) }
         }
     }
 }
+
 

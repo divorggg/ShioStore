@@ -6,20 +6,16 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.shiostore.ui.checkout.CheckoutScreen
 import com.example.shiostore.ui.detail.DetailScreen
 import com.example.shiostore.ui.home.HomeScreen
 import com.example.shiostore.ui.order.CartScreen
+import com.example.shiostore.ui.payment.PaymentSuccessScreen
 import com.example.shiostore.ui.profile.ProfileScreen
+import com.example.shiostore.ui.navigation.Screen
 
 
-sealed class Screen(val route: String) {
-    object Home : Screen("home")
-    object Cart : Screen("cart")
-    object Profile : Screen("profile")
-    object Detail : Screen("detail/{productId}") {
-        fun createRoute(productId: Int) = "detail/$productId"
-    }
-}
+
 @Composable
 fun AppNavHost(navController: NavHostController) {
     NavHost(
@@ -47,6 +43,22 @@ fun AppNavHost(navController: NavHostController) {
                 productId = productId
             )
         }
+
+        composable(
+            route = Screen.Checkout.route,
+            arguments = listOf(
+                navArgument("productId") { type = NavType.IntType }
+            )
+        ) {
+            val productId = it.arguments?.getInt("productId") ?: -1
+            CheckoutScreen(navController, productId)
+        }
+
+
+        composable(Screen.PaymentSuccess.route) {
+            PaymentSuccessScreen(navController)
+        }
+
     }
 }
 
